@@ -4,17 +4,8 @@ var canvasStretch = 1;
 var mandelWorker = null;
 var MAX_ITER = 256;
 var colorList = [{ R: 33, G: 33, B: 33 }, { R: 0, G: 0, B: 255 }, { R: 0, G: 255, B: 0 },];
-//colorList = [ {R:0, G:0, B:0}, {R:12, G:12, B:12}, {R:24, G:24, B:24},
-//  {R:36, G:36, B:36}, {R:0, G:255, B:0},  {R:255, G:165, B:0}, {R:255, G:0, B:0}];
-/**
- * Fractal image generator that wraps around a Canvas element.
- * This worker will draw a fractal (or a portion of one) on the Canvas.
- * The x axis will correspond to the real dimension.
- * The y axis will correspond to the imaginary dimension.
- */
-var MandelCanvas = (function () {
-    function MandelCanvas(canvas_, minX_, minY_, maxX_, maxY_, minR_, minI_, maxR_, maxI_) {
-        /** Shared canvas on which fractal is drawn. */
+class MandelCanvas {
+    constructor(canvas_, minX_, minY_, maxX_, maxY_, minR_, minI_, maxR_, maxI_) {
         this.canvas = null;
         this.image = null;
         this.ctx = null;
@@ -22,21 +13,13 @@ var MandelCanvas = (function () {
         this.canvasHeight = 480;
         this.iHeight = 2.0;
         this.rWidth = 2.0;
-        /** Left-most pixel to start drawing. */
         this.minX = 0;
-        /** Top-most pixel to start drawing. */
         this.minY = 0;
-        /** Right-most pixel to start drawing. */
         this.maxX = 640;
-        /** Bottom-most pixel to start drawing. */
         this.maxY = 480;
-        /** Real component of the top side of the canvas. */
         this.minR = -1.0;
-        /** Imaginary component of the left side of the canvas. */
         this.minI = -1.0;
-        /** Real component of the right side of the canvas. */
         this.maxR = 1.0;
-        /** Imaginary component of the bottom of the canvas. */
         this.maxI = 1.0;
         this.paletteR = null;
         this.paletteG = null;
@@ -56,8 +39,7 @@ var MandelCanvas = (function () {
         this.rWidth = this.maxR - this.minR;
         this.ctx = this.canvas.getContext('2d');
     }
-    /** Draw the fractal portion onto the canvas. */
-    MandelCanvas.prototype.run = function () {
+    run() {
         var img = this.ctx.getImageData(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);
         var pix = img.data;
         var index = 0;
@@ -71,13 +53,8 @@ var MandelCanvas = (function () {
             }
         }
         this.image = img;
-    };
-    /**
-     * Determine the Mandelbrot value for a point in complex number space.
-     * @param {number} cr - distance along the real axis.
-     * @param {number} ci - distance along the imaginary axis.
-     */
-    MandelCanvas.prototype.pointValue = function (cr, ci) {
+    }
+    pointValue(cr, ci) {
         var zr = 0.0;
         var zi = 0.0;
         var t;
@@ -91,20 +68,20 @@ var MandelCanvas = (function () {
             }
         }
         return i;
-    };
-    MandelCanvas.prototype.toI = function (y) {
+    }
+    toI(y) {
         return (y * this.iHeight / this.canvasHeight) + this.minI;
-    };
-    MandelCanvas.prototype.toR = function (x) {
+    }
+    toR(x) {
         return (x * this.rWidth / this.canvasWidth) + this.minR;
-    };
-    MandelCanvas.prototype.toX = function (r) {
+    }
+    toX(r) {
         return (r - this.minR) * this.canvasWidth / this.rWidth;
-    };
-    MandelCanvas.prototype.toY = function (i) {
+    }
+    toY(i) {
         return (i - this.minI) * this.canvasHeight / this.iHeight;
-    };
-    MandelCanvas.prototype.zoomIn = function (minX_, minY_, maxX_, maxY_) {
+    }
+    zoomIn(minX_, minY_, maxX_, maxY_) {
         this.maxR = this.toR(maxX_);
         this.maxI = this.toI(maxY_);
         this.minR = this.toR(minX_);
@@ -112,8 +89,8 @@ var MandelCanvas = (function () {
         this.iHeight = this.maxI - this.minI;
         this.rWidth = this.maxR - this.minR;
         this.run();
-    };
-    MandelCanvas.prototype.zoomOut = function (minX_, minY_, maxX_, maxY_) {
+    }
+    zoomOut(minX_, minY_, maxX_, maxY_) {
         var minX2 = this.minX - minX_;
         var maxX2 = (this.maxX - minX_) * this.canvasWidth / (maxX_ - minX_);
         var minY2 = this.minY - minY_;
@@ -126,8 +103,8 @@ var MandelCanvas = (function () {
         this.iHeight = this.maxI - this.minI;
         this.rWidth = this.maxR - this.minR;
         this.run();
-    };
-    MandelCanvas.prototype.shiftOver = function (minX_, minY_, maxX_, maxY_) {
+    }
+    shiftOver(minX_, minY_, maxX_, maxY_) {
         var minX2 = minX_ - maxX_;
         var maxX2 = this.canvasWidth + minX_ - maxX_;
         var minY2 = minY_ - maxY_;
@@ -137,12 +114,8 @@ var MandelCanvas = (function () {
         this.minR = this.toR(minX2);
         this.minI = this.toI(minY2);
         this.run();
-    };
-    /**
-     * Configure the color by distributing a list of RGB
-     * colors evenly across larger arrays of palette colors.
-     */
-    MandelCanvas.prototype.setupColorList = function (list) {
+    }
+    setupColorList(list) {
         this.paletteR = [];
         this.paletteG = [];
         this.paletteB = [];
@@ -162,9 +135,8 @@ var MandelCanvas = (function () {
         this.paletteR[MAX_ITER - 1] = 0;
         this.paletteG[MAX_ITER - 1] = 0;
         this.paletteB[MAX_ITER - 1] = 0;
-    };
-    return MandelCanvas;
-})();
+    }
+}
 var drag1 = null;
 var drag2 = null;
 function handleMouseDown(event) {

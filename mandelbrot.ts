@@ -1,8 +1,8 @@
 'use strict';
 
-var canvas = null;
+var canvas:any = null;
 var canvasStretch:number = 1;
-var mandelWorker = null;
+var mandelWorker:any = null;
 var MAX_ITER: number = 256;
 var colorList = [ {R:33, G:33, B:33}, {R:0, G:0, B:255}, {R:0, G:255, B:0}, ];
 //colorList = [ {R:0, G:0, B:0}, {R:12, G:12, B:12}, {R:24, G:24, B:24},
@@ -17,9 +17,9 @@ var colorList = [ {R:33, G:33, B:33}, {R:0, G:0, B:255}, {R:0, G:255, B:0}, ];
 class MandelCanvas {
 
     /** Shared canvas on which fractal is drawn. */
-    canvas = null;
-    image = null;
-    ctx = null;
+    canvas:any = null;
+    image:any = null;
+    ctx:any = null;
     canvasWidth:number = 640;
     canvasHeight:number = 480;
     iHeight:number = 2.0;
@@ -49,11 +49,12 @@ class MandelCanvas {
     /** Imaginary component of the bottom of the canvas. */
     maxI:number = 1.0;
 
-    paletteR = null;
-    paletteG = null;
-    paletteB = null;
+    paletteR:any = null;
+    paletteG:any = null;
+    paletteB:any = null;
 
-    constructor(canvas_, minX_, minY_, maxX_, maxY_,  minR_,minI_, maxR_, maxI_) {
+    constructor(canvas_:any, minX_:number, minY_:number, maxX_:number, maxY_:number,  
+        minR_:number, minI_:number, maxR_:number, maxI_:number) {
         this.canvas = canvas_;
         this.canvasWidth = canvas_.width;
         this.canvasHeight = canvas_.height;
@@ -122,7 +123,7 @@ class MandelCanvas {
     	return (i - this.minI) * this.canvasHeight / this.iHeight;
     }
 
-    zoomIn(minX_, minY_, maxX_, maxY_)  {
+    zoomIn(minX_:number, minY_:number, maxX_:number, maxY_:number)  {
     	this.maxR = this.toR(maxX_);
         this.maxI = this.toI(maxY_);
         this.minR = this.toR(minX_);
@@ -132,7 +133,7 @@ class MandelCanvas {
         this.run();
     }
 
-    zoomOut(minX_, minY_, maxX_, maxY_)  {
+    zoomOut(minX_:number, minY_:number, maxX_:number, maxY_:number)  {
     	var minX2 = this.minX - minX_;
     	var maxX2 = (this.maxX - minX_) * this.canvasWidth / (maxX_ - minX_);
     	var minY2 = this.minY - minY_;
@@ -147,7 +148,7 @@ class MandelCanvas {
         this.run();
     }
 
-    shiftOver(minX_, minY_, maxX_, maxY_)  {
+    shiftOver(minX_:number, minY_:number, maxX_:number, maxY_:number)  {
     	var minX2 = minX_ - maxX_;
     	var maxX2 = this.canvasWidth + minX_ - maxX_;
     	var minY2 = minY_ - maxY_;
@@ -187,8 +188,8 @@ class MandelCanvas {
 
 }
 
-var drag1 = null;
-var drag2 = null;
+var drag1:any = null;
+var drag2:any = null;
 
 function handleMouseDown(event) {
     drag1 = {x: event.offsetX / canvasStretch, y: event.offsetY / canvasStretch}
